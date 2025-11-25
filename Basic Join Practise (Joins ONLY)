@@ -1,0 +1,130 @@
+---#Question 1 — INNER JOIN
+Students with grades only
+
+sql
+SELECT s.student_id,
+       s.student_name,
+       g.grade
+FROM students s
+INNER JOIN grades g
+  ON s.student_id = g.student_id;
+  
+---#Question 2 — LEFT JOIN
+All employees, include those without departments
+
+sql
+SELECT e.emp_id,
+       e.emp_name,
+       d.dept_name
+FROM employees e
+LEFT JOIN departments d
+  ON e.emp_id = d.emp_id;
+  
+---#Question 3 — FULL OUTER JOIN
+All products and sales, include unmatched rows
+
+sql
+SELECT COALESCE(p.product_id, s.product_id) AS product_id,
+       p.product_name,
+       s.quantity
+FROM products p
+FULL OUTER JOIN sales s
+  ON p.product_id = s.product_id;
+  
+---#Question 4 — LEFT JOIN + CASE
+Orders with customer type classification
+
+sql
+SELECT o.order_id,
+       o.customer_id,
+       o.amount,
+       c.customer_name,
+       CASE 
+         WHEN c.customer_id IS NULL THEN 'New Customer'
+         ELSE 'Returning Customer'
+       END AS customer_type
+FROM orders o
+LEFT JOIN customers c
+  ON o.customer_id = c.customer_id;
+  
+---#Question 5 — LEFT JOIN + GROUP BY + SUM
+Total sales per region, include regions with no sales
+
+sql
+SELECT r.region_id,
+       r.region_name,
+       COALESCE(SUM(s.amount), 0) AS total_sales
+FROM regions r
+LEFT JOIN sales s
+  ON r.region_id = s.region_id
+GROUP BY r.region_id, r.region_name;
+
+---#Question 6 — LEFT JOIN + CASE
+Classify students by attendance
+
+sql
+SELECT s.student_id,
+       s.name,
+       a.days_present,
+       CASE 
+         WHEN a.days_present >= 15 THEN 'Excellent'
+         WHEN a.days_present BETWEEN 6 AND 14 THEN 'Needs Improvement'
+         WHEN a.days_present <= 5 THEN 'Poor Attendance'
+         ELSE 'No Record'
+       END AS attendance_status
+FROM students s
+LEFT JOIN attendance a
+  ON s.student_id = a.student_id;
+  
+---#Question 7 — INNER JOIN + COUNT + GROUP BY
+Task count per project (only projects with tasks)
+
+sql
+SELECT p.project_id,
+       p.name,
+       COUNT(t.task_id) AS task_count
+FROM projects p
+INNER JOIN tasks t
+  ON p.project_id = t.project_id
+GROUP BY p.project_id, p.name;
+
+---#Question 8 — FULL OUTER JOIN + CASE + WHERE
+Classify customers by return status, filter order_total > 100
+
+sql
+SELECT COALESCE(o.cust_id, r.cust_id) AS cust_id,
+       o.order_total,
+       r.return_total,
+       CASE 
+         WHEN r.return_id IS NOT NULL THEN 'Returned'
+         ELSE 'No Return'
+       END AS return_status
+FROM orders o
+FULL OUTER JOIN returns r
+  ON o.cust_id = r.cust_id
+WHERE o.order_total > 100;
+
+---#Question 9 — LEFT JOIN + COUNT + ORDER BY
+Login count per user, ordered by count
+
+sql
+SELECT u.user_id,
+       u.name,
+       COUNT(l.login_date) AS login_count
+FROM users u
+LEFT JOIN logins l
+  ON u.user_id = l.user_id
+GROUP BY u.user_id, u.name
+ORDER BY login_count DESC;
+
+---#Question 10 — LEFT JOIN + CASE + ORDER BY
+Teachers with subjects, label if none
+
+sql
+SELECT t.teacher_id,
+       t.teacher_name,
+       COALESCE(s.subject_name, 'No Subject Assigned') AS subject_name
+FROM teachers t
+LEFT JOIN subjects s
+  ON t.teacher_id = s.teacher_id
+ORDER BY t.teacher_name ASC;
